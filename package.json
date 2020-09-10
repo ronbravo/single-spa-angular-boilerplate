@@ -1,0 +1,26 @@
+{
+  "name": "@thetrg/single-spa-boilerplate",
+  "version": "1.0.0",
+  "description": "A set of boilerplate configurations for working with the Single SPA framework.",
+  "main": "index.js",
+  "keywords": [],
+  "author": "The TRG, LLC",
+  "license": "MIT",
+  "micro": {
+    "prefix": "release/",
+    "app": {
+      "root-app": "git@github.com:ronbravo/single-spa-boilerplate.git",
+      "sample-angular-app": "git@github.com:ronbravo/single-spa-boilerplate.git"
+    }
+  },
+  "config": {
+    "port": 4300
+  },
+  "scripts": {
+    "dev": "cd public && npx live-server --port=$npm_package_config_port --no-browser --cors "
+  },
+  "dependencies": {
+    "deepmerge": "^4.2.2",
+    "live-server": "^1.2.1"
+  }
+}
