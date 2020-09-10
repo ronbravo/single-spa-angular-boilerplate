@@ -1,0 +1,24 @@
+{
+  "name": "@thetrg/single-spa-boilerplate",
+  "version": "1.0.0",
+  "description": "A set of boilerplate configurations for working with the Single SPA framework.",
+  "main": "index.js",
+  "keywords": [],
+  "author": "The TRG, LLC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/ronbravo/single-spa-boilerplate/issues"
+  },
+  "homepage": "https://github.com/ronbravo/single-spa-boilerplate#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ronbravo/single-spa-boilerplate.git"
+  },
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "deepmerge": "^4.2.2",
+    "sirloin": "^0.17.2"
+  }
+}
