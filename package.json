@@ -14,11 +14,13 @@
     "type": "git",
     "url": "git+https://github.com/ronbravo/single-spa-boilerplate.git"
   },
-  "scripts": {
-    "start": "node server.js"
+  "bin": {
+    "spa": "./bin/spa.js"
   },
+  "scripts": {},
   "dependencies": {
     "deepmerge": "^4.2.2",
-    "sirloin": "^0.17.2"
+    "fs-extra": "^9.0.1",
+    "minimist": "^1.2.5"
   }
 }
