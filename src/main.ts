@@ -8,5 +8,28 @@ if (environment.production) {
   enableProdMode();
 }
 
-platformBrowserDynamic().bootstrapModule(AppModule)
-  .catch(err => console.error(err));
+let sspa;
+if (window['getSspa']) { sspa = window['getSspa'](); }
+
+if (!sspa) {
+  // Start the angular app module.
+  platformBrowserDynamic().bootstrapModule(AppModule)
+    .catch(err => console.log(err));
+}
+else {
+  sspa.registry.add({
+    org: 'abc-inc',
+    name: 'sample-angular-app',
+    type: 'angular',
+    boot: (setup) => {
+      // Start the angular app module.
+      platformBrowserDynamic().bootstrapModule(AppModule)
+        .then((mod) => {
+          // Register and setup the startup angular module.
+          setup({ mod });
+        })
+        .catch(err => console.error(err));
+    }
+  });
+}
+
