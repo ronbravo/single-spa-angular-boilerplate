@@ -2,6 +2,8 @@ const singleSpaAngularWebpack = require('single-spa-angular/lib/webpack').defaul
 const { resolve, sep } = require('path');
 const pkg = require('./package.json');
 
+const webpack = require('webpack');
+
 // Set the ouput of the static files to the root app.
 let name = pkg.name;
 if (name.indexOf('/') > -1) {
@@ -14,8 +16,32 @@ console.log('STATIC OUTPUT:', dest);
 module.exports = (angularWebpackConfig, options) => {
   let config;
 
-  // config = angularWebpackConfig;
-  // return config;
+  config = angularWebpackConfig;
+
+  angularWebpackConfig.devServer.writeToDisk = true;
+
+  let bob = singleSpaAngularWebpack(angularWebpackConfig, options);
+  bob.output.path = dest;
+  bob.devServer.writeToDisk = true;
+
+  // const compiler = webpack(bob);
+
+  // // `compiler.run()` doesn't support promises yet, only callbacks
+  // new Promise((resolve, reject) => {
+
+
+
+  //   compiler.run((err, res) => {
+  //     if (err) {
+  //       return reject(err);
+  //     }
+  //     console.log('\n\n******* cooool *******\n\n');
+  //     resolve(res);
+  //   });
+  // });
+
+
+  return config;
 
   // if (process.env.SPA_DEVMODE === 'dev') {
   //   config = angularWebpackConfig;
@@ -23,9 +49,8 @@ module.exports = (angularWebpackConfig, options) => {
   //   return config;
   // }
 
-  // Feel free to modify this webpack config however you'd like to
-  config = singleSpaAngularWebpack(angularWebpackConfig, options);
-  config.output.path = dest;
+  // // Feel free to modify this webpack config however you'd like to
+  // config = singleSpaAngularWebpack(angularWebpackConfig, options);
+  // config.output.path = dest;
   // return config;
-  return [angularWebpackConfig, singleSpaAngularWebpack];
 };

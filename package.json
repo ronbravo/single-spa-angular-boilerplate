@@ -11,7 +11,8 @@
     "test": "ng test",
     "lint": "ng lint",
     "e2e": "ng e2e",
-    "build:spa": "npx ng build --watch"
+    "build:spa": "npx ng build --watch",
+    "serve:spa": "npx ng serve --port $npm_package_config_port "
   },
   "private": true,
   "dependencies": {
