@@ -2,9 +2,10 @@
 window.tmLoaderQueue({
   list: [
     'https://cdnjs.cloudflare.com/ajax/libs/voca/1.4.0/voca.min.js',
+    'https://cdn.jsdelivr.net/npm/zone.js@0.10.3/dist/zone.min.js',
     'https://cdnjs.cloudflare.com/ajax/libs/single-spa/5.5.5/umd/single-spa.min.js',
   ],
-  name: 'SSPA Dependencies and Core',
+  name: 'SSBP Dependencies and Core',
   module: './sspa/Sspa.js',
   done: () => {
     let spa;
@@ -15,13 +16,14 @@ window.tmLoaderQueue({
         apps: [
           {
             name: 'sample-angular-v5-app',
-            app: () => import ('http://localhost:4302/main.sspa.js'),
+            // app: () => import ('http://localhost:4302/main.sspa.js'),
+            app: () => import ('http://localhost:4301/main.sspa.js'),
             activeWhen: '/',
             customProps: {
               active: true,
               time: Date.now (),
             }
-          }, 
+          },
         ]
       };
     }
@@ -33,7 +35,7 @@ window.tmLoaderQueue({
     });
 
     // Start the app.
-    spa.start();   
+    spa.start();
   }
 });
 
@@ -160,7 +162,7 @@ window.tmLoaderQueue({
 // export class Registry {
 //   static add ({ boot, name = '', org = 'sspa-global' }) {
 //     console.log (`SSPA: Adding`);
-    
+
 //     if (!cache [org]) { cache [org] = {}; }
 //     cache [org] [name] = {
 //       name: `${org}/${name}`,
@@ -185,7 +187,7 @@ window.tmLoaderQueue({
 
 // System.import('https://cdnjs.cloudflare.com/ajax/libs/single-spa/5.5.5/umd/single-spa.min.js').then(async (singleSpa) => {
 //   const { registerApplication, start } = singleSpa.default;
-  
+
 //   // Setup the global sspa context.
 //   window.$__sspa = new Sspa ();
 
@@ -201,7 +203,7 @@ window.tmLoaderQueue({
 //             active: true,
 //             time: Date.now (),
 //           }
-//         }, 
+//         },
 //       ]
 //     };
 //   }
