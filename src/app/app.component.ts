@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'ng-app-root',
+  selector: 'experian-eds-app',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.less']
 })
