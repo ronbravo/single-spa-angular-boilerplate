@@ -8,18 +8,18 @@ if (environment.production) {
   enableProdMode();
 }
 
-let sspa;
-if (window['getSspa']) { sspa = window['getSspa'](); }
+let ssbp;
+if (window['getSsbp']) { ssbp = window['getSsbp'](); }
 
-if (!sspa) {
+if (!ssbp) {
   // Start the angular app module.
   platformBrowserDynamic().bootstrapModule(AppModule)
     .catch(err => console.log(err));
 }
 else {
-  sspa.registry.add({
-    org: 'abc-inc',
-    name: 'sample-angular-app',
+  ssbp.registry.add({
+    name: 'eds-app',
+    org: 'experian',
     type: 'angular',
     boot: (setup) => {
       // Start the angular app module.
@@ -32,4 +32,3 @@ else {
     }
   });
 }
-
