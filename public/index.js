@@ -15,14 +15,23 @@ window.tmLoaderQueue({
       return {
         apps: [
           {
-            name: 'sample-angular-v5-app',
-            app: () => import ('http://localhost:4301/main.ssbp.js'),
+            name: 'eds-lib',
+            app: () => import('/static/experian/eds-app/main.ssbp.boot.js'),
             activeWhen: '/',
             customProps: {
               active: true,
               time: Date.now (),
             }
           },
+          // {
+          //   name: 'primary-header',
+          //   app: () => import ('http://localhost:4301/main.ssbp.js'),
+          //   activeWhen: '/',
+          //   customProps: {
+          //     active: true,
+          //     time: Date.now (),
+          //   }
+          // },
         ]
       };
     }
