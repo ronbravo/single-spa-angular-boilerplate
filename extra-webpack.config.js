@@ -21,6 +21,33 @@ module.exports = (angularWebpackConfig, options) => {
   ssbp.output.path = dest;
   ssbp.output.filename = '[name].ssbp.js';
   ssbp.devServer.writeToDisk = true;
+
+
+  // ssbp.externals.lodash = {
+  //   commonjs: 'lodash',
+  //   commonjs2: 'lodash',
+  //   amd: 'lodash',
+  //   root: '_',
+  // };
+
+  // Check if there are libraries we need to externalize.
+  if (pkg.peerDependencies) {
+    Object.keys(pkg.peerDependencies).forEach((key) => {
+      ssbp.externals[key] = key;
+    });
+  }
+
+  // ssbp.externals.uikit = {
+  //   commonjs: 'uikit',
+  //   commonjs2: 'uikit',
+  //   amd: 'uikit',
+  //   root: 'uikit',
+  // };
+  // ssbp.externals = ['zone.js', 'uikit'];
+  // ssbp.externals.uikit = ['UiKit', 'Icons'];
+  // console.log('EXTERNALS:', ssbp.externals);
+  console.log('PEER DEPENDENCIES:', ssbp.externals);
+
   const compiler = webpack(ssbp);
   compiler.watch({
     aggregateTimeout: 300,
