@@ -17,10 +17,12 @@
     "port": 4300
   },
   "scripts": {
-    "dev": "cd public && npx live-server --port=$npm_package_config_port --no-browser --cors "
+    "dev": "node server.js",
+    "devold": "cd public && npx live-server --port=$npm_package_config_port --no-browser --cors "
   },
   "dependencies": {
     "deepmerge": "^4.2.2",
-    "live-server": "^1.2.1"
+    "live-server": "^1.2.1",
+    "node-fetch": "^2.6.1"
   }
 }

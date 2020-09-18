@@ -1,155 +1,100 @@
-// When the window has loaded.
-window.addEventListener('load', function () {
+import { QueueLoader } from './queue-loader/QueueLoader.js';
 
-  /**
-   * LoaderQueue
-   */
-  class LoaderQueue {
-    static done ({ state }) {
-      if (state.log) { console.log(`Done loading - ${state.name}`); }
-      if (state.module) { 
-        LoaderQueue.loadModule({ state }); 
-      } else if (state.done) { 
-        state.done (); 
-      }
-    }
+const cache = {
+  full: {},
+  short: {},
+};
 
-    static load ({ item, state }) {
-      let dom, url;
+/**
+ * TmLoader
+ */
+export class TmLoader {
+  static add ({ item, mod, state }) {
+    let list, short;
 
-      dom = document.createElement ('script');
-
-      url = item;
-      if (item.url) { url = item.url; }
-      dom.src = url;
-
-      if (item.type) { dom.type = item.type; }
-
-      dom.onload = function () {
-        if (Object.keys (exports).length) {
-          TmLoader.add ({ file: item, mod: exports });
-        }
-        else if (Object.keys (module.exports).length) {
-          TmLoader.add ({ file: item, mod: module.exports });
-        }
-
-        LoaderQueue.reset ();
-        if (state.log) { console.log ('Loaded:', item); }
-        state.count++;
-        if (state.count >= state.list.length) {
-          LoaderQueue.done ({ state });
-        }
-      }
-      scriptDom.appendChild (dom);
-    }
-
-    static loadModule({ state }) {
-      let dom;
-      dom = document.createElement('script');
-      dom.src = state.module;
-      dom.type = 'module';
-      dom.onload = function () {
-        if (state.log) { console.log('Loaded module:', state.module); }
-        if (state.done) {
-          state.done();
-        }
-      }
-      scriptDom.appendChild(dom);
-    }
-
-    static reset() {
-      window.exports = {};
-      window.module = {};
-      module.exports = {};
-    }
-
-    static start ({ state }) {
-      state.count = 0;
-      if (!state.name) { state.name = `tm-loader-queue-${Date.now()}`; }
-
-      LoaderQueue.reset();
-      state.list.forEach((item) => {
-        LoaderQueue.load({ item, state });
-      });
-    }
-  }
-
-  // TmLoader;
-  let cache, id, queues, scriptDom;
-
-  id = 'tm-loader-scripts';
-  scriptDom = document.querySelector (`#${id}`);
-  if (!scriptDom) {
-    scriptDom = document.createElement ('div');
-    scriptDom.id = 'tm-loader-scripts';
-    document.body.appendChild (scriptDom);
-  }
-
-  cache = {
-    full: {},
-    short: {},
-  };
-
-  /**
-   * TmLoader
-   */
-  class TmLoader {
-    static add ({ file, mod }) {
-      let item, list, short;
-
-      // Parse out the short name of the file.
-      list = file.split ('/');
-      short = list [(list.length - 1)];
+    // Parse out the short name of the file.
+    if (mod) {
+      list = item.url.split('/');
+      short = list[(list.length - 1)];
       short = short.split('.')[0];
 
       // Cache the module.
       item = {
-        file,
+        url: item.url,
         mod,
       };
-      cache.full [file] = item;
-      cache.short [short] = item;
+      cache.full[item.url] = item;
+      cache.short[short] = item;
     }
 
-    static find (short = '', full = '') {
-      let item;
-
-      name = short;
-      item = cache.short [name];
-      if (full) {
-        name = full;
-        item = cache.full [name];
+    if (state) {
+      QueueLoader.increment({ item, state });
+      if (state.log) {
+        console.log('cache:', cache);
       }
-      if (item) { return item.mod; }
-      throw new Error(`ERROR: The TmLoader module '${name}' was not found.`);
-    }
-
-    static load (queue) {
-      LoaderQueue.start({ state: queue });
     }
   }
-  window.getTmLoader = function () { return TmLoader; }
 
-  // Load the cached queues.
-  if (window.$___tm_loader_temp_queues) {
-    queues = window.$___tm_loader_temp_queues;
-    delete window.$___tm_loader_temp_queues;
+  static define (args) {
+    args.mod = args.mod;
+    TmLoader.add (args);
+  }
 
-    if (queues) {
-      queues.forEach ((queue) => {
-        TmLoader.load (queue);
-      });
+  static find (short = '', full = '') {
+    let item;
+
+    name = short;
+    item = cache.short[name];
+    if (full) {
+      name = full;
+      item = cache.full[name];
     }
+    if (item) { return item.mod; }
+    throw new Error(`ERROR: The TmLoader module '${name}' was not found.`);
   }
-});
 
-// Set a list of items to load.
-window.tmLoaderQueue = function (queue) {
-  if (!window.getTmLoader) {
-    if (!window.$___tm_loader_temp_queues) { window.$___tm_loader_temp_queues = []; }
-    window.$___tm_loader_temp_queues.push (queue);
+  static load (queue) {
+    QueueLoader.start ({ state: queue });
   }
-  else {
-    window.getTmLoader ().load (queue);
+
+  static setup (config) {
+    this.setup = undefined;
+    let base;
+
+    base = `/cdn/proxy`;
+    TmLoader.load ({
+      list: [
+        { module: false, url: `${base}/cdnjs/acorn/8.0.1/acorn.min.js` },
+        { module: false, url: `${base}/cdnjs/voca/1.4.0/voca.min.js` },
+      ],
+      log: config.log,
+      name: 'Tamed Loader Dependencies',
+      // module: './ssbp/Ssbp.js',
+      done: () => {
+        // Setup TamedJs Loader.
+
+        // Bootup the app.
+        TmLoader.load (config);
+      }
+    });
   }
 }
+
+// if (args.item.url.indexOf('single-spa') > -1) {
+//   // UMD Loading?
+//   let umd = {};
+//   args.mod(umd);
+//   args.mod = umd;
+//   import('https://cdnjs.cloudflare.com/ajax/libs/single-spa/5.5.5/esm/single-spa.min.js').then((mod) => {
+//     console.log('MOD:', mod);
+//   })
+// }
+// else if (args.item.url.indexOf('uikit') > -1) {
+//   console.log('*** here:', args.mod ());
+//   args.mod = args.mod();
+// }
+// else {
+//   // AMD Loading?
+//   args.mod = args.mod(window);
+// }
+// console.log(args.item.url, args.mod);
