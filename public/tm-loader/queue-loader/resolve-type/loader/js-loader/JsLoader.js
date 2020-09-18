@@ -1,5 +1,3 @@
-import { TmLoader } from '../../../../TmLoader.js';
-import { QueueLoader } from '../../../QueueLoader.js';
 import { JsmLoader } from '../jsm-loader/JsmLoader.js';
 
 export class JsLoader {
@@ -13,7 +11,7 @@ export class JsLoader {
     // Load the script.
     if (!item.module) {
       // Load and AMD module.
-      dom.onload = () => { TmLoader.add({ item, state }); }
+      dom.onload = () => { tml.add({ item, state }); }
       JsLoader.getParentDom ().appendChild (dom);
     }
     else {

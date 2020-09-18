@@ -36,7 +36,11 @@ export class TmLoader {
   }
 
   static define (args) {
-    args.mod = args.mod;
+    let context;
+
+    context = {};
+    args.mod (context);
+    args.mod = context;
     TmLoader.add (args);
   }
 
@@ -55,6 +59,10 @@ export class TmLoader {
 
   static load (queue) {
     QueueLoader.start ({ state: queue });
+  }
+
+  static require(name) {
+    return TmLoader.find(name);
   }
 
   static setup (config) {

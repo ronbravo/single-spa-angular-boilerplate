@@ -1,6 +1,3 @@
-import { TmLoader } from '../../../../TmLoader.js';
-import { QueueLoader } from '../../../QueueLoader.js';
-
 export class CssLoader {
   static load({ item, state }) {
     fetch(item.url)
@@ -13,7 +10,7 @@ export class CssLoader {
         dom.type = 'text/css';
         dom.rel = 'stylesheet';
         CssLoader.getParentDom().appendChild(dom);
-        TmLoader.add({ item, mod: text, state });
+        tmls.add({ item, mod: text, state });
       });
   }
 

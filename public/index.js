@@ -7,9 +7,9 @@ import ('./tm-loader/index.js').then (() => {
   // Load the Single Spa Setup.
   window.getTmLoader ().setup ({
     list: [
-      '/tm-loader/_info/test/Bob.js',
+      '/tm-loader/_info/test/sample/game/Game.js',
     ],
-    log: true,
+    log: !true,
     name: 'App Bootup',
     // module: './ssbp/Ssbp.js',
     done: () => {

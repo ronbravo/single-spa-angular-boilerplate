@@ -1,7 +1,15 @@
 import { TmLoader } from './TmLoader.js';
 
-Object.defineProperty(window, 'getTmLoader', {
+Object.defineProperty (window, 'getTmLoader', {
   value: function () { return TmLoader; },
+});
+
+Object.defineProperty (window, 'tml', {
+  value: TmLoader,
+});
+
+Object.defineProperty (window, 'require', {
+  value: TmLoader.require,
 });
 
 // let queues;

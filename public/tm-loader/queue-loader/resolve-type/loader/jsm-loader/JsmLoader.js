@@ -1,15 +1,19 @@
-import { TmLoader } from '../../../../TmLoader.js';
 import { QueueLoader } from '../../../QueueLoader.js';
 
 export class JsmLoader {
   static load ({ item, state }) {
-    console.log ('ITEM:', item);
     fetch (item.url)
       .then (res => res.text ())
-      .then ((text) => {
-        let acorn;
+      .then ((code) => {
+        let acorn, ast;
 
-        acorn = TmLoader.find ('acorn');
+        acorn = tml.require ('acorn');
+        ast = acorn.parse (code, {
+          ecmaVersion: 2020,
+          sourceType: 'module',
+        });
+        console.log ('ast:', ast);
+
         QueueLoader.increment ({ item, state });
       })
       .catch ((err) => {

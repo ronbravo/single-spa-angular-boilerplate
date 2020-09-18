@@ -14,7 +14,7 @@
     }
   },
   "config": {
-    "port": 4300
+    "port": 4400
   },
   "scripts": {
     "dev": "node server.js",
