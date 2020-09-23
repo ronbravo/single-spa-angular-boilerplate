@@ -26,7 +26,6 @@ import ('./tm-loader/index.js').then (() => {
             {
               scope: '',
               map: {
-
               }
             }
           ]

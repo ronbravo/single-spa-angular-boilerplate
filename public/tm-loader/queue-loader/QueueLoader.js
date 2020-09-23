@@ -20,11 +20,16 @@ export class QueueLoader {
   }
 
   static done({ state }) {
-    if (state.log) { console.log(`Done loading - ${state.name}`); console.log(''); }
+    if (state.log) {
+      console.log (`Done loading - ${state.name}`);
+      console.log ('');
+    }
+
     if (state.module) {
-      JsLoader.loadModule({ state });
-    } else if (state.done) {
-      state.done();
+      JsLoader.loadModule ({ state });
+    }
+    else if (state.done) {
+      state.done ();
     }
   }
 
@@ -56,7 +61,8 @@ export class QueueLoader {
     if (state.log) { console.log('Loaded:', item); }
     state.count++;
     if (state.count >= state.import.list.length) {
-      QueueLoader.done({ state });
+      tml.done ({ item, state, cb: function () { QueueLoader.done ({ state }) } });
+      // QueueLoader.done({ state });
     }
   }
 
@@ -68,7 +74,7 @@ export class QueueLoader {
   static start ({ state }) {
     state.count = 0;
     if (!state.name) { state.name = `tm-loader-queue-${Date.now()}`; }
-    
+
     state.import.list.forEach ((item) => {
       QueueLoader.load ({ item, state });
     });

@@ -1,9 +1,16 @@
 import { QueueLoader } from './queue-loader/QueueLoader.js';
 
 const cache = {
+  count: {
+    full: 0,
+    short: 0,
+  },
   full: {},
   short: {},
 };
+
+const queue = [];
+const done = [];
 
 /**
  * TmLoader
@@ -25,14 +32,19 @@ export class TmLoader {
 
     // Cache the module.
     item.mod = mod;
-    if (!cache.full[item.url]) {
-      cache.full[item.url] = item;
+    target = cache.full[item.url];
+    if (!target) {
+      target = item;
+      cache.full [item.url] = target;
+      if (!target.aliases) { target.aliases = []; }
+      cache.count.full++;
     }
 
     // Cache by alias
-    target = cache.full[item.url];
     if (!cache.short[item.short]) {
+      target.aliases.push(item.short);
       cache.short[item.short] = target;
+      cache.count.short++;
     }
 
     if (state) {
@@ -43,14 +55,41 @@ export class TmLoader {
     }
   }
 
+  static done ({ cb, item, state }) {
+    let found;
+
+
+    found = TmLoader.find (null, item.url, true);
+    console.log ('FOUND:', found);
+    // // console.log ('CACHE:', cache);
+    //
+    // if (found) {
+    //   // console.log ('ITEM:', item);
+    //   // console.log ('STATE:', state);
+    //   found.done = true;
+    //   done.push (item.url);
+    //   // console.log ('WHAT:', done.length);
+    // }
+
+    // queue.push (cb);
+    // // console.log ('STATE:', state);
+    // // console.log ('CACHE:', cache);
+    // Object.keys (cache.full).forEach ((key) => {
+    //   let item;
+    //   item = cache.full [key];
+    //   console.log ('ITEM:', item);
+    // });
+  }
+
   static define (key, factory) {
     if (factory === undefined) {
       factory = key;
-      key = `unknown-${Date.now()}.js`;
+      key = `unknown-${Date.now ()}.js`;
     }
+
     // console.log('WHAT:', [].slice.call(arguments));
-    window.tml.set({ item: { url: key }, mod: factory });
-    console.log('CACHE:', cache);
+    window.tml.set ({ item: { url: key }, mod: factory });
+    console.log ('CACHE:', cache);
   }
 
   static set (args) {
@@ -68,7 +107,7 @@ export class TmLoader {
     TmLoader.add ({ item, mod });
   }
 
-  static find (short = '', full = '') {
+  static find (short = '', full = '', fullItem = false) {
     let item;
 
     name = short;
@@ -77,11 +116,27 @@ export class TmLoader {
       name = full;
       item = cache.full[name];
     }
-    if (item) { return item.mod; }
+
+    if (item && !fullItem) { return item.mod; }
+    else { return item; }
+
     throw new Error(`ERROR: The TmLoader module '${name}' was not found.`);
   }
 
-  static import () { return { Player: 'mario', Health: 45 }; }
+  static import (path, scope) {
+    let mod;
+    try {
+      mod = TmLoader.find(path);
+    }
+    catch (err) {
+      if (path === '@project/player') {
+        console.log('TODO: Load the module. Try and use maps...');
+      }
+      console.log('scope:', scope);
+      console.warn(err);
+    }
+    return { Player: 'mario', Health: 45 };
+  }
 
   static load (queue) {
     QueueLoader.start ({ state: queue });

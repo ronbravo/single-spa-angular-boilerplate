@@ -39,7 +39,7 @@ export class Transform {
       });
 
       // Create the final statement.
-      statement = `const { ${children.join (', ')} } = await tml.import('${item.source.value}', module.file);`;
+      statement = `const { ${children.join (', ')} } = await tml.import('${item.source.value}', module);`;
 
       modified = modified.slice(0, item.start) + statement + modified.slice(item.end);
     }
