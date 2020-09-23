@@ -1,3 +1,6 @@
-import { Player } from '@sample/Player.js';
+import { Player, Health as Bob } from '@project/Player.js';
 
-export class Game {}
+console.log ('Player:', Player);
+console.log ('Health:', Bob);
+
+console.log('The game has started...');

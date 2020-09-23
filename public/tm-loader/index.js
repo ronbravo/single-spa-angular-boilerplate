@@ -1,9 +1,5 @@
 import { TmLoader } from './TmLoader.js';
 
-Object.defineProperty (window, 'getTmLoader', {
-  value: function () { return TmLoader; },
-});
-
 Object.defineProperty (window, 'tml', {
   value: TmLoader,
 });

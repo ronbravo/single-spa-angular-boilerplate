@@ -10,21 +10,29 @@ const cache = {
  */
 export class TmLoader {
   static add ({ item, mod, state }) {
-    let list, short;
+    let list, short, target;
 
     // Parse out the short name of the file.
-    if (mod) {
-      list = item.url.split('/');
+    if (item.mod) { mod = item.mod; }
+
+    // Get the short name.
+    list = item.url.split('/');
+    short = item.alias;
+    if (!short) {
       short = list[(list.length - 1)];
       short = short.split('.')[0];
+    }
 
-      // Cache the module.
-      item = {
-        url: item.url,
-        mod,
-      };
+    // Cache the module.
+    item.mod = mod;
+    if (!cache.full[item.url]) {
       cache.full[item.url] = item;
-      cache.short[short] = item;
+    }
+
+    // Cache by alias
+    target = cache.full[item.url];
+    if (!cache.short[item.short]) {
+      cache.short[item.short] = target;
     }
 
     if (state) {
@@ -36,12 +44,18 @@ export class TmLoader {
   }
 
   static define (args) {
-    let context;
+    let { item, mod } = args;
+    let context, result;
 
     context = {};
-    args.mod (context);
-    args.mod = context;
-    TmLoader.add (args);
+    result = mod (context);
+    mod = context;
+    if (result) {
+      mod = result;
+    }
+    item = QueueLoader.asQueueItem({ item });
+
+    TmLoader.add ({ item, mod });
   }
 
   static find (short = '', full = '') {
@@ -57,13 +71,13 @@ export class TmLoader {
     throw new Error(`ERROR: The TmLoader module '${name}' was not found.`);
   }
 
+  static import () { return { Player: 'mario', Health: 45 }; }
+
   static load (queue) {
     QueueLoader.start ({ state: queue });
   }
 
-  static require(name) {
-    return TmLoader.find(name);
-  }
+  static require(name) { return TmLoader.find(name); }
 
   static setup (config) {
     this.setup = undefined;
@@ -73,13 +87,21 @@ export class TmLoader {
     TmLoader.load ({
       list: [
         { module: false, url: `${base}/cdnjs/acorn/8.0.1/acorn.min.js` },
-        { module: false, url: `${base}/cdnjs/voca/1.4.0/voca.min.js` },
+        { module: false, url: `${base}/jsdelivr/jsonpath-plus@4.0.0/dist/index-umd.min.js`, alias: 'json-path' },
+        { module: false, url: `${base}/cdnjs/voca/1.4.0/voca.min.js`, alias: 'bob' },
+        // { module: false, url: `${base}/cdnjs/uikit/3.5.7/js/uikit.min.js` },
+        // { module: false, url: `${base}/jsdelivr/slugify@1.4.5/slugify.min.js` },
       ],
       log: config.log,
       name: 'Tamed Loader Dependencies',
       // module: './ssbp/Ssbp.js',
       done: () => {
         // Setup TamedJs Loader.
+        // console.log (tml.require ('voca').slugify('some sample 232 @#$ url'));
+        // console.log (tml.require ('bob').slugify('some sample 232 @#$ url'));
+        // console.log (tml.require ('acorn').parse('let bob = "car";'));
+        // console.log (tml.require ('uikit').notification('hi'));
+        // console.log (tml.require ('slugify')('coo dfsa 2#@# 443l43$$$'));
 
         // Bootup the app.
         TmLoader.load (config);

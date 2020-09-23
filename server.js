@@ -50,6 +50,10 @@ const options = {
             base = `https://cdnjs.cloudflare.com/ajax/libs`;
             break;
 
+          case 'jsdelivr':
+            base = `https://cdn.jsdelivr.net/npm`;
+            break;
+
           case 'unpkg':
             base = `https://unpkg.com`;
             break;
@@ -68,12 +72,12 @@ const options = {
 
 body = `(function () {
   const define = function (key, factory) {
-    if (window.getTmLoader) {
+    if (window.tml) {
       if (factory === undefined) {
         factory = key;
       }
       // console.log('WHAT:', [].slice.call(arguments));
-      window.getTmLoader().define({ item: { url: '${url.pathname}' }, mod: factory });
+      window.tml.define({ item: { url: '${url.pathname}' }, mod: factory });
     }
   }
   define.amd = true;

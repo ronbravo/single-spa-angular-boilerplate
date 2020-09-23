@@ -1,11 +1,11 @@
 import ('./tm-loader/index.js').then (() => {
   window.require = function (name) {
-    let mod = window.getTmLoader ().find (name);
+    let mod = window.tml.find (name);
     return mod;
   }
 
   // Load the Single Spa Setup.
-  window.getTmLoader ().setup ({
+  window.tml.setup ({
     list: [
       '/tm-loader/_info/test/sample/game/Game.js',
     ],
@@ -17,7 +17,21 @@ import ('./tm-loader/index.js').then (() => {
   });
 });
 
-
+// if ('serviceWorker' in navigator) {
+//   // console.log('*** yes');
+//   console.log('CLIENT: service worker registration in progress.');
+//   navigator.serviceWorker.register('/bob.js').then(function() {
+//     console.log('CLIENT: service worker registration complete.');
+//
+//
+//
+//   }, function(err) {
+//     console.log('CLIENT: service worker registration failure.', err);
+//   });
+// }
+// else {
+//   console.log('*** NOPE');
+// }
 
 
 

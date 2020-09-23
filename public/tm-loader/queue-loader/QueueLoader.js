@@ -43,9 +43,12 @@ export class QueueLoader {
     if (item.base === undefined) { item.base = item.url; }
     if (item.query === undefined) { item.query = ''; }
 
-    list = item.url.split('/');
-    short = list[(list.length - 1)];
-    short = short.split('.')[0];
+    short = item.alias;
+    if (!short) {
+      list = item.url.split('/');
+      short = list[(list.length - 1)];
+      short = short.split('.')[0];
+    }
     return short;
   }
 

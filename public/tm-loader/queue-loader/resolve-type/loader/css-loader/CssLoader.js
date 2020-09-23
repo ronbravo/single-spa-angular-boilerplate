@@ -10,7 +10,7 @@ export class CssLoader {
         dom.type = 'text/css';
         dom.rel = 'stylesheet';
         CssLoader.getParentDom().appendChild(dom);
-        tmls.add({ item, mod: text, state });
+        tml.add({ item, mod: text, state });
       });
   }
 
