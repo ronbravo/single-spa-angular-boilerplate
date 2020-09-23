@@ -43,7 +43,17 @@ export class TmLoader {
     }
   }
 
-  static define (args) {
+  static define (key, factory) {
+    if (factory === undefined) {
+      factory = key;
+      key = `unknown-${Date.now()}.js`;
+    }
+    // console.log('WHAT:', [].slice.call(arguments));
+    window.tml.set({ item: { url: key }, mod: factory });
+    console.log('CACHE:', cache);
+  }
+
+  static set (args) {
     let { item, mod } = args;
     let context, result;
 
@@ -83,18 +93,49 @@ export class TmLoader {
     this.setup = undefined;
     let base;
 
+    // // TODO: Place console in it's own area.
+    // let orig = window.console.log;
+    // let log = function () {
+    //   let args = [].slice.call (arguments);
+    //   orig.apply (window, args);
+    // }
+    //
+    // window.console.log = log;
+    // // window.error = log;
+
+    // if (!window.tml) {
+    //   Object.defineProperty (window, 'tml', {
+    //     value: TmLoader,
+    //   });
+    // }
+
+    Object.defineProperty (window, 'require', {
+      value: TmLoader.require,
+    });
+
+    Object.defineProperty (window, 'define', {
+      value: TmLoader.define,
+    });
+
+    Object.defineProperty (window.define, 'amd', {
+      value: true,
+    });
+
+
     base = `/cdn/proxy`;
     TmLoader.load ({
-      list: [
-        { module: false, url: `${base}/cdnjs/acorn/8.0.1/acorn.min.js` },
-        { module: false, url: `${base}/jsdelivr/jsonpath-plus@4.0.0/dist/index-umd.min.js`, alias: 'json-path' },
-        { module: false, url: `${base}/cdnjs/voca/1.4.0/voca.min.js`, alias: 'bob' },
-        // { module: false, url: `${base}/cdnjs/uikit/3.5.7/js/uikit.min.js` },
-        // { module: false, url: `${base}/jsdelivr/slugify@1.4.5/slugify.min.js` },
-      ],
       log: config.log,
       name: 'Tamed Loader Dependencies',
       // module: './ssbp/Ssbp.js',
+      import: {
+        list: [
+          { module: false, url: `${base}/cdnjs/acorn/8.0.1/acorn.min.js` },
+          { module: false, url: `${base}/jsdelivr/jsonpath-plus@4.0.0/dist/index-umd.min.js`, alias: 'json-path' },
+          { module: false, url: `${base}/cdnjs/voca/1.4.0/voca.min.js`, alias: 'bob' },
+          // { module: false, url: `${base}/cdnjs/uikit/3.5.7/js/uikit.min.js` },
+          // { module: false, url: `${base}/jsdelivr/slugify@1.4.5/slugify.min.js` },
+        ],
+      },
       done: () => {
         // Setup TamedJs Loader.
         // console.log (tml.require ('voca').slugify('some sample 232 @#$ url'));
@@ -109,6 +150,10 @@ export class TmLoader {
     });
   }
 }
+
+Object.defineProperty (window, 'tml', {
+  value: TmLoader,
+});
 
 // if (args.item.url.indexOf('single-spa') > -1) {
 //   // UMD Loading?

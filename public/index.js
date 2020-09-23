@@ -1,18 +1,42 @@
 import ('./tm-loader/index.js').then (() => {
-  window.require = function (name) {
-    let mod = window.tml.find (name);
-    return mod;
-  }
+
+  // console.log(mod);
+  // window.require = function (name) {
+  //   let mod = window.tml.find (name);
+  //   return mod;
+  // }
 
   // Load the Single Spa Setup.
   window.tml.setup ({
-    list: [
-      '/tm-loader/_info/test/sample/game/Game.js',
-    ],
     log: !true,
     name: 'App Bootup',
     // module: './ssbp/Ssbp.js',
+    import: {
+      list: [
+        { module: 'fake', url: `/tm-loader/_info/test/sample/game/Game.js`, alias: 'Game.js' },
+      ],
+      maps: [
+        {
+          scope: '',
+          context: '',
+          map: {
+            '@project/game': '/tm-loader/_info/test/sample/game/Game.js',
+          },
+          children: [
+            {
+              scope: '',
+              map: {
+
+              }
+            }
+          ]
+        },
+      ],
+      map: {
+      },
+    },
     done: () => {
+      console.log (tml.import ('Game').PLAYER_NAME);
     }
   });
 });

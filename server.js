@@ -71,13 +71,26 @@ const options = {
             body = body.slice(0, index);
 
 body = `(function () {
+  const require = function (key) {
+    if (window.tml) {
+      return window.tml.require (key);
+    }
+    else {
+      throw new Error ('The TmLoader has not been setup.');
+    }
+  }
+  require.amd = true;
+
   const define = function (key, factory) {
     if (window.tml) {
       if (factory === undefined) {
         factory = key;
       }
-      // console.log('WHAT:', [].slice.call(arguments));
-      window.tml.define({ item: { url: '${url.pathname}' }, mod: factory });
+      // console.log ('WHAT:', [].slice.call (arguments));
+      window.tml.set ({ item: { url: '${url.pathname}' }, mod: factory });
+    }
+    else {
+      throw new Error ('The TmLoader has not been setup.');
     }
   }
   define.amd = true;

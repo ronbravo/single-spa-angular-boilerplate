@@ -55,7 +55,7 @@ export class QueueLoader {
   static increment({ item, state }) {
     if (state.log) { console.log('Loaded:', item); }
     state.count++;
-    if (state.count >= state.list.length) {
+    if (state.count >= state.import.list.length) {
       QueueLoader.done({ state });
     }
   }
@@ -68,8 +68,8 @@ export class QueueLoader {
   static start ({ state }) {
     state.count = 0;
     if (!state.name) { state.name = `tm-loader-queue-${Date.now()}`; }
-
-    state.list.forEach ((item) => {
+    
+    state.import.list.forEach ((item) => {
       QueueLoader.load ({ item, state });
     });
   }
