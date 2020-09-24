@@ -14,7 +14,11 @@ setTimeout(() => {
 // TODO: Create a test for the regex on different import statements:
 // https://regexr.com/47jlq
 
-export class Enemy {}
+export class Enemy {
+  attack() {
+    console.log ('The goomba has attacked...');
+  }
+}
 export const PLAYER_ID = 12345;
 export const PLAYER_NAME = 'Bob';
 

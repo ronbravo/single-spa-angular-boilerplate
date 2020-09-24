@@ -13,29 +13,39 @@ import ('./tm-loader/index.js').then (() => {
     // module: './ssbp/Ssbp.js',
     import: {
       list: [
-        { module: 'fake', url: `/tm-loader/_info/test/sample/game/Game.js`, alias: 'Game.js' },
-      ],
-      maps: [
         {
-          scope: '',
-          context: '',
-          map: {
-            '@project/game': '/tm-loader/_info/test/sample/game/Game.js',
-          },
-          children: [
-            {
-              scope: '',
-              map: {
-              }
-            }
-          ]
+          module: 'virtual',
+          url: `/tm-loader/_info/test/sample/game/Game.js`,
+          alias: 'Game'
         },
       ],
-      map: {
-      },
+      // maps: [
+      //   {
+      //     scope: '',
+      //     context: '',
+      //     map: {
+      //       '@project/game': '/tm-loader/_info/test/sample/game/Game.js',
+      //     },
+      //     children: [
+      //       {
+      //         scope: '',
+      //         map: {
+      //         }
+      //       }
+      //     ]
+      //   },
+      // ],
+      // map: {
+      // },
     },
     done: () => {
-      console.log (tml.import ('Game').PLAYER_NAME);
+      const { Enemy } = tml.import ('Game');
+
+      let goomba = new Enemy();
+      goomba.attack ();
+      
+      // console.log ('GAME:', );
+      // console.log ('GAME:', tml.find ('Game', null, true));
     }
   });
 });

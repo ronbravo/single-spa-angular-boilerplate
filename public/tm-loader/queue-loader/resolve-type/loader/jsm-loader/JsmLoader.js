@@ -97,6 +97,9 @@ modified = modified.slice(0, list[0].start) + modified.slice(list[0].start);
 
 export class JsmLoader {
   static load ({ item, state }) {
+
+    // tml.add({ item, state });
+
     fetch (item.url)
       .then (res => res.text ())
       .then ((code) => {
@@ -109,7 +112,7 @@ export class JsmLoader {
         match = code.match(regex);
 
         // Modify the ES6 code.
-        if (match.length) {
+        if (match.length && item.module === 'virtual') {
           ast = acorn.parse (code, {
             ecmaVersion: 2020,
             sourceType: 'module',
@@ -147,29 +150,36 @@ export class JsmLoader {
           console.log (code);
           console.log ('ITEM:', item);
 
-          if (item.module === 'fake') {
-            let dom = document.createElement('script');
-            // dom.type = 'module';
-            dom.innerHTML = code;
-            document.body.appendChild(dom);
+          let dom = document.createElement('script');
+          dom.download = 'Bobbby';
+          dom.src = `data:text/javascript;charset=utf-8,`
+            + encodeURIComponent(code);
+          // dom.innerHTML = code;
 
-            // console.log (tml.require('Game.js'));
-            // console.log (tml.get);
+          // dom.onreadystatechange = function () {
+          dom.onload = function () {
+            console.log ('**** BUT WHY ****');
+            tml.add({ item, state });
           }
-          else {
-            // const dataUri = 'data:text/javascript;charset=utf-8,'
-            //   + encodeURIComponent(code);
-            //
-            // import(dataUri)
-            //   .then((mod) => {
-            //     console.log('MODULE:', mod, mod.NAME);
-            //     Object.keys(mod).forEach((key) => {
-            //       console.log(key, ':', mod[key]);
-            //     })
-            //   });
-          }
+
+          document.body.appendChild(dom);
+          return;
+          // console.log (tml.require('Game.js'));
+          // console.log (tml.get);
         }
-        QueueLoader.increment ({ item, state });
+
+        // const dataUri = 'data:text/javascript;charset=utf-8,'
+        //   + encodeURIComponent(code);
+        //
+        // import(dataUri)
+        //   .then((mod) => {
+        //     console.log('MODULE:', mod, mod.NAME);
+        //     Object.keys(mod).forEach((key) => {
+        //       console.log(key, ':', mod[key]);
+        //     })
+        //   });
+        tml.add({ item, state });
+        // QueueLoader.increment ({ item, state });
       })
       .catch ((err) => {
         console.error (`ERROR: ${err.message}`);

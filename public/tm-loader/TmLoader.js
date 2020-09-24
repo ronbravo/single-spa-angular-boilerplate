@@ -3,36 +3,39 @@ import { QueueLoader } from './queue-loader/QueueLoader.js';
 const cache = {
   count: {
     full: 0,
-    short: 0,
+    alias: 0,
   },
   full: {},
-  short: {},
+  alias: {},
+  callbacks: [],
+  done: [],
 };
 
-const queue = [];
-const done = [];
+// const queue = [];
+// const doneList = [];
+// const callbackList = [];
 
 /**
  * TmLoader
  */
 export class TmLoader {
   static add ({ item, mod, state }) {
-    let list, short, target;
+    let list, alias, target;
 
-    // Parse out the short name of the file.
-    if (item.mod) { mod = item.mod; }
+    // Parse out the alias name of the file.
+    // if (mod !== undefined) { item.mod = mod; }
 
-    // Get the short name.
+    // Get the alias name.
     list = item.url.split('/');
-    short = item.alias;
-    if (!short) {
-      short = list[(list.length - 1)];
-      short = short.split('.')[0];
+    alias = item.alias;
+    if (!alias) {
+      alias = list [(list.length - 1)];
+      alias = alias.split('.')[0];
     }
 
     // Cache the module.
-    item.mod = mod;
-    target = cache.full[item.url];
+    // item.mod = mod;
+    target = cache.full [item.url];
     if (!target) {
       target = item;
       cache.full [item.url] = target;
@@ -41,26 +44,69 @@ export class TmLoader {
     }
 
     // Cache by alias
-    if (!cache.short[item.short]) {
-      target.aliases.push(item.short);
-      cache.short[item.short] = target;
-      cache.count.short++;
+    if (item.mod && !target.mod) { target.mod = item.mod; }
+    if (!cache.alias [item.alias]) {
+      target.aliases.push (item.alias);
+      cache.alias [item.alias] = target;
+      cache.count.alias++;
     }
 
     if (state) {
-      QueueLoader.increment({ item, state });
+      QueueLoader.increment ({ item, state });
       if (state.log) {
         console.log('cache:', cache);
       }
     }
   }
 
-  static done ({ cb, item, state }) {
-    let found;
-
+  static done ({ complete, item, state }) {
+    let end, found, i, key, list, mod, ready;
 
     found = TmLoader.find (null, item.url, true);
-    console.log ('FOUND:', found);
+
+    if (found) {
+      // if (found.module === false) { found.done = true; }
+      found.done = true;
+      cache.done.push (item.url);
+      // cache.callbacks.push ({ mod: found, complete });
+
+      if (state.count >= state.import.list.length) {
+        if (cache.done.length >= cache.count.full) {
+          console.log ('HERE NOW', cache.done.length, cache.count.full, state.count, state.import.list.length);
+          cache.callbacks.push ({ mod: found, complete });
+
+          ready = true;
+          list = Object.keys (cache.full);
+          end = list.length;
+          for (i = 0; i < end; i++) {
+            key = list[i];
+            mod = cache.full [key];
+            if (!mod.done) {
+              ready = false;
+              break;
+            }
+          }
+
+          if (ready) {
+            cache.callbacks.forEach ((callback) => {
+              // setTimeout(() => {
+                callback.complete ();
+                if (state.log) {
+                  console.log ('ITEM:', mod);
+                  console.log ('MODULE DONE:', callback.mod);
+                }
+              // }, 1000);
+            });
+            cache.callbacks = [];
+          }
+        }
+      }
+    }
+    else {
+      console.log ('ERROR:', item, state);
+      throw new Error (`Cache item not found because it was not properly set: ${item.url}`);
+    }
+
     // // console.log ('CACHE:', cache);
     //
     // if (found) {
@@ -89,12 +135,11 @@ export class TmLoader {
 
     // console.log('WHAT:', [].slice.call(arguments));
     window.tml.set ({ item: { url: key }, mod: factory });
-    console.log ('CACHE:', cache);
   }
 
   static set (args) {
     let { item, mod } = args;
-    let context, result;
+    let context, found, result;
 
     context = {};
     result = mod (context);
@@ -102,40 +147,65 @@ export class TmLoader {
     if (result) {
       mod = result;
     }
-    item = QueueLoader.asQueueItem({ item });
 
-    TmLoader.add ({ item, mod });
+    found = TmLoader.find(null, item.url, true);
+    if (found) { item = found; }
+
+    item = QueueLoader.asQueueItem ({ item });
+    item.mod = mod;
+    TmLoader.add ({ item });
   }
 
-  static find (short = '', full = '', fullItem = false) {
+  static find (alias = '', full = '', fullItem = false) {
     let item;
 
-    name = short;
-    item = cache.short[name];
+    name = alias;
+    item = cache.alias [name];
     if (full) {
       name = full;
-      item = cache.full[name];
+      item = cache.full [name];
     }
 
     if (item && !fullItem) { return item.mod; }
     else { return item; }
 
-    throw new Error(`ERROR: The TmLoader module '${name}' was not found.`);
+    throw new Error (`ERROR: The TmLoader module '${name}' was not found.`);
   }
 
   static import (path, scope) {
-    let mod;
+    let item;
     try {
-      mod = TmLoader.find(path);
+      item = TmLoader.find(path, null, true);
+      console.log('MODULE:', path, item, Object.keys(cache.alias));
+
+      if (item && item.mod) {
+        return item.mod;
+      }
+      // if (item) {
+      //   console.log('NO:', path, item.mod);
+      // }
+      return { Player: 'mario', Health: 45 };
     }
     catch (err) {
-      if (path === '@project/player') {
-        console.log('TODO: Load the module. Try and use maps...');
-      }
+      // if (path === '@project/player') {
+      //   console.log('TODO: Load the module. Try and use maps...');
+      // }
+      // console.log('HFASDFAS???/')
+      // TmLoader.load ({
+      //   import: {
+      //     list: [
+      //       {
+      //         module: false,
+      //         url: `/public/tm-loader/_info/test/sample/game/player/Player.js`, alias: path
+      //       },
+      //     ],
+      //   },
+      // });
+
       console.log('scope:', scope);
       console.warn(err);
+      return { Player: 'mario', Health: 45 };
     }
-    return { Player: 'mario', Health: 45 };
   }
 
   static load (queue) {
@@ -201,6 +271,8 @@ export class TmLoader {
 
         // Bootup the app.
         TmLoader.load (config);
+        console.log ('CACHE:', cache);
+        // console.log ('CONFIG:', config);
       }
     });
   }

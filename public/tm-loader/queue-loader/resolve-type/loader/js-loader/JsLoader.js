@@ -20,20 +20,6 @@ export class JsLoader {
     }
   }
 
-  static loadModule ({ parentDom, state }) {
-    let dom;
-    dom = document.createElement ('script');
-    dom.src = state.module;
-    dom.type = 'module';
-    dom.onload = function () {
-      if (state.log) { console.log ('Loaded module:', state.module); }
-      if (state.done) {
-        state.done ();
-      }
-    }
-    JsLoader.getParentDom ().appendChild (dom);
-  }
-
   static getParentDom () {
     let dom, id;
 
@@ -47,6 +33,22 @@ export class JsLoader {
     return dom;
   }
 }
+
+
+
+// static loadModule ({ parentDom, state }) {
+//   let dom;
+//   dom = document.createElement ('script');
+//   dom.src = state.module;
+//   dom.type = 'module';
+//   dom.onload = function () {
+//     if (state.log) { console.log ('Loaded module:', state.module); }
+//     if (state.done) {
+//       state.done ();
+//     }
+//   }
+//   JsLoader.getParentDom ().appendChild (dom);
+// }
 
 /* Typical AMD loader code:
   (function (global, factory) {
@@ -67,7 +69,7 @@ export class JsLoader {
 
 
 // let mod;
-// mod = cache[item.short];
+// mod = cache[item.alias];
 // console.log('COOL:', [].slice.call(arguments));
 // console.log('COOL:', item, cache, cache[item.url]);
 

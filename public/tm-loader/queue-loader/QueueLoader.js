@@ -11,10 +11,11 @@ export class QueueLoader {
     }
     else {
       info = Object.assign({ module: true }, item);
+      if (item.module !== undefined) { info.module = item.module; }
     }
 
     item = info;
-    item.short = QueueLoader.getShortName({ item });
+    item.alias = QueueLoader.getAliasName({ item });
     item.ext = ResolveType.getExtension({ item });
     return item;
   }
@@ -33,10 +34,10 @@ export class QueueLoader {
     }
   }
 
-  static getShortName({ item }) {
-    let index, list, short, url;
+  static getAliasName({ item }) {
+    let index, list, alias, url;
 
-    // Parse out the short name of the file.
+    // Parse out the alias name of the file.
     url = item.url;
     index = url.lastIndexOf('?');
     if (index > -1) {
@@ -48,32 +49,39 @@ export class QueueLoader {
     if (item.base === undefined) { item.base = item.url; }
     if (item.query === undefined) { item.query = ''; }
 
-    short = item.alias;
-    if (!short) {
+    alias = item.alias;
+    if (!alias) {
       list = item.url.split('/');
-      short = list[(list.length - 1)];
-      short = short.split('.')[0];
+      alias = list[(list.length - 1)];
+      alias = alias.split('.')[0];
     }
-    return short;
+    return alias;
   }
 
   static increment({ item, state }) {
     if (state.log) { console.log('Loaded:', item); }
     state.count++;
-    if (state.count >= state.import.list.length) {
-      tml.done ({ item, state, cb: function () { QueueLoader.done ({ state }) } });
+    // if (state.count >= state.import.list.length) {
+      tml.done ({
+        complete: function () { QueueLoader.done ({ state }) },
+        item,
+        state
+      });
       // QueueLoader.done({ state });
-    }
+    // }
   }
 
   static load ({ item, state }) {
     item = QueueLoader.asQueueItem ({ item });
+    tml.add ({ item });
     ResolveType.load ({ item, state })
   }
 
   static start ({ state }) {
     state.count = 0;
+
     if (!state.name) { state.name = `tm-loader-queue-${Date.now()}`; }
+    if (state.import.list === undefined) { state.import.list = []; }
 
     state.import.list.forEach ((item) => {
       QueueLoader.load ({ item, state });
